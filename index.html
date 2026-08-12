@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>1.35°N — Singapore Design Biennale 2027 · Interactive Demo</title>
+<meta name="description" content="1.35°N — a living map of the Singapore Design Biennale 2027. Discover, design and co-create through stories, quests and rewards across every district. Interactive mobile demo by Rally AI.">
+<meta name="theme-color" content="#0A1522">
+<meta name="color-scheme" content="dark light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="1.35°N">
+<link rel="icon" type="image/png" href="./assets/demo/rally-logo-small.png">
+<link rel="apple-touch-icon" href="./assets/demo/rally-logo-small.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="1.35°N — Singapore Design Biennale 2027">
+<meta property="og:description" content="A living map of the Biennale — stories, quests and rewards across every district. Interactive mobile demo by Rally AI.">
+<meta property="og:image" content="./assets/demo/sg-pixel-map.png">
+<meta name="twitter:card" content="summary_large_image">
+<!-- React vendored locally so the demo has no third-party CDN dependency: support.js
+     loadReactUmd() short-circuits when window.React / window.ReactDOM already exist.
+     Both files verified against the SRI hashes pinned in support.js. -->
+<script src="./vendor/react.production.min.js"></script>
+<script src="./vendor/react-dom.production.min.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Sans:wght@400;600;700;800;900&amp;family=VT323&amp;display=swap">
+  <style>
+    html,body{margin:0;padding:0;background:#0A1522;}
+    a{color:#253FF6;text-decoration:none;} a:hover{color:#1B2FC0;}
+    /* --- web-publication mobile fit (added on top of the 410x880 design canvas) --- */
+    html,body{overflow-x:hidden;overscroll-behavior:none;}
+    .dc-stage{width:100%;}
+    /* touch-action:manipulation removes the 300ms double-tap delay without disabling pinch-zoom */
+    .app-shell{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+    /* Phones: drop the desktop phone-frame chrome and run edge-to-edge */
+    @media (max-width:439px){
+      .app-shell{width:100vw!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;}
+    }
+    @keyframes joinPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+    @keyframes ringPulse{0%{transform:translate(-50%,-50%) scale(0.7);opacity:0.9}100%{transform:translate(-50%,-50%) scale(1.9);opacity:0}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes panelIn{from{transform:translateY(101%)}to{transform:translateY(0)}}
+    @keyframes cursorBlink{0%,50%{opacity:1}51%,100%{opacity:0}}
+    @keyframes earthIn{from{transform:scale(0.35);opacity:0}to{transform:scale(1);opacity:1}}
+    @keyframes earthOut{from{transform:scale(1);opacity:1}to{transform:scale(7);opacity:0}}
+    @keyframes islandIn{from{transform:translate(-44%,-39%) scale(1.5);opacity:0}to{transform:translate(-44%,-39%) scale(1);opacity:1}}
+    @keyframes twinkle{0%,100%{opacity:0.25}50%{opacity:1}}
+    @keyframes coinPop{0%{transform:scale(0.2) rotate(-14deg);opacity:0}60%{transform:scale(1.18) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    @keyframes dashMove{to{stroke-dashoffset:-20}}
+    @keyframes globeSpin{to{background-position:-3520px 0}}
+    @keyframes sootIdle{to{background-position:-936px 0}}
+    @keyframes waveSwap{0%,100%{opacity:0}50%{opacity:1}}
+    @keyframes coinSpin{to{background-position-x:133.4%}}
+    @keyframes toastUp{0%{opacity:0;transform:translate(-50%,10px)}18%{opacity:1;transform:translate(-50%,0)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-14px)}}
+    @keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes walk{0%,100%{transform:translate(-50%,-100%) translateY(0)}50%{transform:translate(-50%,-100%) translateY(-3px)}}
+  </style>
+</helmet>
+<div class="dc-stage" style="min-height: 100dvh; display: flex; align-items: center; justify-content: center; background: #0A1522; font-family: 'Funnel Sans',sans-serif;">
+  <div class="app-shell" style="position:relative;width:min(100vw,410px);height:min(100dvh,880px);background:#F1ECE1;overflow:hidden;border-radius:26px;box-shadow:0 30px 80px rgba(0,0,0,0.6);user-select:none;-webkit-user-select:none;">
+
+    <!-- ============ HOME ============ -->
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;inset:0;overflow-y:auto;padding:18px 16px 24px;box-sizing:border-box;display:flex;flex-direction:column;">
+        <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <img src="assets/demo/rally-logo-small.png" alt="Rally" style="height:30px;display:block;">
+          <div style="display:flex;align-items:center;gap:5px;background:#FFFFFF;border:1.5px solid #EDE3D4;border-radius:100px;padding:6px 12px;font-weight:800;font-size:0.82rem;color:#1A1A1A;">
+            <div style="width:16px;height:16px;background:url('assets/demo/coin-spin.png') 0 0 no-repeat;background-size:400% 100%;image-rendering:pixelated;"></div>{{ coins }}
+          </div>
+        </div>
+        <div style="flex-shrink:0;margin-top:auto;text-align:center;font-weight:900;color:#1A1A1A;font-size:1.35rem;margin-bottom:14px;">Campaigns near you</div>
+        <div onClick="{{ startTeaser }}" style="flex-shrink:0;background:#FFFFFF;border-radius:20px;overflow:hidden;cursor:pointer;box-shadow:0 2px 10px rgba(26,26,26,0.05);">
+          <div style="position:relative;aspect-ratio:880/495;background:#0A1522;overflow:hidden;">
+            <sc-for list="{{ stars }}" as="s" hint-placeholder-count="0">
+              <div style="position:absolute;left:{{ s.left }};top:{{ s.top }};width:{{ s.size }};height:{{ s.size }};background:{{ s.color }};animation:twinkle {{ s.dur }} ease-in-out infinite;animation-delay:{{ s.delay }};"></div>
+            </sc-for>
+            <div style="position:absolute;right:-14px;top:calc(50% - 88px);width:176px;height:176px;background:url('assets/demo/globe-sprite.png') 0 0 no-repeat;background-size:3520px 176px;image-rendering:pixelated;animation:globeSpin 16s steps(20) infinite;"></div>
+            <div style="position:absolute;left:0;right:0;top:calc(50% + 8px);border-top:3px dashed rgba(255,215,85,0.5);"></div>
+            <div style="position:absolute;left:18px;top:50%;transform:translateY(-50%);font-family:'VT323',monospace;color:#FFD755;font-size:4.7rem;line-height:1;">1.35°N</div>
+            <div style="position:absolute;left:20px;top:calc(50% + 44px);font-family:'VT323',monospace;color:rgba(245,239,228,0.66);font-size:0.82rem;letter-spacing:0.12em;">DISCOVER · DESIGN · CO-CREATION</div>
+            <div style="position:absolute;top:10px;left:10px;background:{{ badgeBg }};border-radius:999px;padding:3px 10px;font-size:0.65rem;font-weight:800;color:white;letter-spacing:0.05em;text-transform:uppercase;display:flex;align-items:center;gap:5px;">{{ badgeLabel }}</div>
+          </div>
+          <div style="padding:16px 16px 20px;">
+            <div style="font-weight:900;color:#1A1A1A;font-size:1.5rem;line-height:1.15;">1.35°N SDB 2027</div>
+            <div style="font-weight:600;color:#8A8078;font-size:0.85rem;margin-top:4px;line-height:1.5;">The Singapore Design Biennale on a living map — stories, quests and rewards across every district.</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:14px;">
+              <div style="flex-shrink:0;width:50px;border-radius:12px;overflow:hidden;border:1.5px solid #EDE3D4;background:#FFFFFF;text-align:center;">
+                <div style="background:#253FF6;color:#FFFFFF;font-weight:800;font-size:0.58rem;letter-spacing:0.08em;padding:3px 0;">MAY</div>
+                <div style="font-weight:900;color:#1A1A1A;font-size:1.35rem;line-height:1;padding:5px 0 6px;">14</div>
+              </div>
+              <div>
+                <div style="font-weight:800;color:#8A8078;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;">Campaign period</div>
+                <div style="font-weight:900;color:#1A1A1A;font-size:1.05rem;line-height:1.2;margin-top:2px;">14 May – 20 Jun 2027</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <div style="display:flex;align-items:center;gap:4px;background:#FFFFFF;border:1.5px solid #EDE3D4;border-radius:100px;padding:5px 12px;font-size:0.78rem;font-weight:700;color:#1A1A1A;">🗺️ 40 events</div>
+              <div style="display:flex;align-items:center;gap:4px;background:#FFFFFF;border:1.5px solid #EDE3D4;border-radius:100px;padding:5px 12px;font-size:0.78rem;font-weight:700;color:#1A1A1A;">👥 {{ goingCount }} going</div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:16px;">
+              <button onClick="{{ startTeaserBtn }}" style="flex:1;padding:10px 0;border-radius:100px;font-family:'Funnel Sans',sans-serif;font-weight:800;font-size:0.75rem;cursor:pointer;border:1.5px solid #1A1A1A;background:#1A1A1A;color:#FFFFFF;">Explore preview</button>
+            </div>
+          </div>
+        </div>
+        <div style="flex-shrink:0;margin-top:auto;padding-top:22px;text-align:center;font-weight:700;color:#A79C8D;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;">Rally AI · consumer demo · SDB 2027</div>
+      </div>
+    </sc-if>
+
+    <!-- ============ TEASER ============ -->
+    <sc-if value="{{ isTeaser }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:#0A1522;overflow:hidden;">
+        <sc-for list="{{ stars }}" as="s" hint-placeholder-count="0">
+          <div style="position:absolute;left:{{ s.left }};top:{{ s.top }};width:{{ s.size }};height:{{ s.size }};background:{{ s.color }};animation:twinkle {{ s.dur }} ease-in-out infinite;animation-delay:{{ s.delay }};"></div>
+        </sc-for>
+        <sc-if value="{{ teaserEarth }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;">
+            <img src="assets/demo/pixel-earth.png" alt="Earth" style="width:62%;image-rendering:pixelated;animation:{{ earthAnim }};animation-fill-mode:both;">
+            <div style="text-align:center;animation:fadeUp 1.6s ease 1.2s both;">
+              <div style="font-family:'VT323',monospace;color:#FFD755;font-size:3.4rem;line-height:1;">1.35°N</div>
+              <div style="font-family:'VT323',monospace;color:#F5EFE4;font-size:1.25rem;letter-spacing:0.12em;margin-top:6px;">SINGAPORE DESIGN BIENNALE 2027</div>
+              <div style="font-family:'VT323',monospace;color:rgba(245,239,228,0.55);font-size:1rem;letter-spacing:0.2em;margin-top:14px;animation:cursorBlink 1.2s step-end infinite;">▼ LOCATING 1.35°N ▼</div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ teaserDialog }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:#1A466E;">
+            <div style="position:absolute;inset:0;background:url('assets/demo/ocean-tile-a.png') repeat;background-size:384px 384px;image-rendering:pixelated;"></div>
+            <div style="position:absolute;inset:0;background:url('assets/demo/ocean-tile-b.png') repeat;background-size:384px 384px;image-rendering:pixelated;animation:waveSwap 5s ease-in-out infinite;"></div>
+            <div style="position:absolute;left:50%;top:50%;width:145%;aspect-ratio:1080/720;transform:translate(-44%,-39%);animation:islandIn 0.9s cubic-bezier(0.22,1,0.36,1) both;">
+              <img src="assets/demo/sg-ocean-a.png" alt="" style="position:absolute;inset:0;width:100%;image-rendering:pixelated;">
+              <img src="assets/demo/sg-ocean-b.png" alt="" style="position:absolute;inset:0;width:100%;image-rendering:pixelated;animation:waveSwap 5s ease-in-out infinite;">
+            </div>
+            <button onClick="{{ skipTeaser }}" style="position:absolute;top:14px;right:14px;background:rgba(10,21,34,0.65);border:2px solid rgba(245,239,228,0.35);border-radius:6px;color:#F5EFE4;font-family:'VT323',monospace;font-size:0.95rem;letter-spacing:0.1em;padding:4px 10px;cursor:pointer;">SKIP ▸</button>
+            <div style="position:absolute;left:12px;right:12px;bottom:16px;">
+              <div onClick="{{ advanceDialog }}" style="position:relative;background:#191a1d;border:3px solid #FFFFFF;border-radius:12px;box-shadow:0 6px 0 #2c2e33,0 14px 22px rgba(0,0,0,0.45);padding:26px 18px 38px;font-family:'VT323',monospace;cursor:pointer;animation:panelIn 0.28s cubic-bezier(0.34,1.4,0.64,1);">
+                <div style="position:absolute;top:-62px;right:18px;width:86px;height:86px;background:#F1ECE1;border:3px solid #FFFFFF;border-radius:8px;box-shadow:0 3px 0 #25272b;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;">
+                  <div role="img" aria-label="Soot" style="width:78px;height:78px;margin-bottom:1px;background:url('assets/demo/soot-sprite.png') 0 0 no-repeat;background-size:936px 78px;image-rendering:pixelated;animation:sootIdle 4.2s steps(12) infinite;"></div>
+                </div>
+                <div style="position:absolute;top:0;left:18px;transform:translateY(-50%);background:#191a1d;border:3px solid #FFFFFF;border-radius:5px;box-shadow:0 3px 0 #25272b;padding:3px 11px;color:#f3f3ef;font-size:0.95rem;text-transform:uppercase;letter-spacing:0.07em;line-height:1.2;">SOOT · YOUR GUIDE</div>
+                <div style="color:#a9adb4;font-size:0.9rem;letter-spacing:0.14em;margin-bottom:6px;">{{ dlgHeader }}</div>
+                <div style="color:#f3f3ef;font-size:1.35rem;line-height:1.35;min-height:74px;">{{ dlgShown }}<span style="display:{{ cursorDisplay }};animation:cursorBlink 0.8s step-end infinite;">▌</span></div>
+                <sc-if value="{{ dlgAtEnd }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ openMapBtn }}" style="width:100%;margin-top:14px;background:#FFD755;border:3px solid #FFFFFF;border-radius:8px;box-shadow:0 4px 0 #b1932f;color:#191a1d;font-family:'VT323',monospace;font-size:1.35rem;letter-spacing:0.1em;padding:10px 0;cursor:pointer;">NEXT ▸</button>
+                </sc-if>
+                <div style="position:absolute;bottom:12px;left:18px;display:flex;gap:6px;">
+                  <sc-for list="{{ dlgDots }}" as="d" hint-placeholder-count="4">
+                    <div style="width:7px;height:7px;background:{{ d.bg }};"></div>
+                  </sc-for>
+                </div>
+                <div style="position:absolute;bottom:10px;right:16px;color:#b4b8bf;font-size:0.95rem;letter-spacing:0.1em;">{{ dlgCta }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ PERSONA ============ -->
+    <sc-if value="{{ isPersona }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:#0A1522;overflow:hidden;">
+        <div style="position:absolute;inset:0;background:url('assets/demo/ocean-tile-navy.png') repeat;background-size:384px 384px;image-rendering:pixelated;opacity:0.55;"></div>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;">
+        <div style="flex:0 0 auto;padding:22px 18px 0;font-family:'VT323',monospace;">
+          
+          <div style="color:#f3f3ef;font-size:1.75rem;line-height:1.1;margin-top:6px;">Choose your character<br></div>
+        </div>
+        <div style="flex:1 1 auto;min-height:0;overflow-y:auto;margin:14px 14px 0;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:min-content;gap:10px;align-content:start;">
+          <sc-for list="{{ personaCards }}" as="p" hint-placeholder-count="4">
+            <div onClick="{{ p.onTap }}" style="position:relative;background:{{ p.bg }};border:3px solid {{ p.border }};box-shadow:0 4px 0 {{ p.shadow }};padding:12px 10px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center;">
+              <div style="width:56px;height:70px;image-rendering:pixelated;background-image:{{ p.imgCss }};background-size:contain;background-repeat:no-repeat;background-position:center;"></div>
+              <div style="margin-top:8px;font-family:'VT323',monospace;font-size:0.92rem;letter-spacing:0.06em;line-height:1.05;color:{{ p.nameColor }};">{{ p.name }}</div>
+              <div style="margin-top:5px;font-family:'VT323',monospace;font-size:0.82rem;line-height:1.15;color:{{ p.blurbColor }};">{{ p.blurb }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:0 0 auto;padding:22px 12px 14px;">
+          <div style="position:relative;background:#191a1d;border:3px solid #FFFFFF;border-radius:12px;box-shadow:0 6px 0 #2c2e33,0 14px 22px rgba(0,0,0,0.45);padding:24px 16px 16px;font-family:'VT323',monospace;">
+            <div style="position:absolute;top:-56px;right:16px;width:78px;height:78px;background:#F1ECE1;border:3px solid #FFFFFF;border-radius:8px;box-shadow:0 3px 0 #25272b;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;">
+              <div role="img" aria-label="Soot" style="width:78px;height:78px;background:url('assets/demo/soot-sprite.png') 0 0 no-repeat;background-size:936px 78px;image-rendering:pixelated;animation:sootIdle 4.2s steps(12) infinite;"></div>
+            </div>
+            <div style="position:absolute;top:0;left:16px;transform:translateY(-50%);background:#191a1d;border:3px solid #FFFFFF;border-radius:5px;box-shadow:0 3px 0 #25272b;padding:2px 10px;color:#f3f3ef;font-size:0.88rem;text-transform:uppercase;letter-spacing:0.07em;line-height:1.2;">{{ personaHeader }}</div>
+            <div style="color:#f3f3ef;font-size:1.15rem;line-height:1.35;min-height:84px;padding-right:70px;">{{ personaShown }}</div>
+            <sc-if value="{{ personaPicked }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ enterIsland }}" style="width:100%;margin-top:10px;background:#FFD755;border:3px solid #FFFFFF;border-radius:8px;box-shadow:0 4px 0 #b1932f;color:#191a1d;font-family:'VT323',monospace;font-size:1.25rem;letter-spacing:0.1em;padding:9px 0;cursor:pointer;">ENTER THE ISLAND ▸</button>
+            </sc-if>
+          </div>
+        </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ MAP ============ -->
+    <sc-if value="{{ isMap }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:url('assets/demo/ocean-tile-navy.png') repeat;background-size:384px 384px;image-rendering:pixelated;overflow:hidden;">
+        <div ref="{{ vpRef }}" onPointerDown="{{ panStart }}" onPointerMove="{{ panMove }}" onPointerUp="{{ panEnd }}" onPointerLeave="{{ panEnd }}" style="position:absolute;inset:0;cursor:grab;touch-action:none;" data-map-viewport="1">
+          <div style="position:absolute;left:0;top:0;width:1350px;height:900px;transform:{{ panTransform }};transform-origin:0 0;will-change:transform;">
+            <img src="assets/demo/sg-pixel-map.png" alt="Singapore" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;">
+            <div style="position:absolute;left:0;right:0;top:41.7%;border-top:3px dashed rgba(255,215,85,0.5);pointer-events:none;"></div>
+            <div style="position:absolute;left:12px;top:39.2%;font-family:'VT323',monospace;color:rgba(255,215,85,0.85);font-size:1.05rem;letter-spacing:0.14em;pointer-events:none;">1.35°N</div>
+            <svg viewBox="0 0 1350 900" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:{{ routeDisplay }};">
+              <polyline points="672,478 656,494 634,516 616,536 600,556" fill="none" stroke="rgba(10,21,34,0.55)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"></polyline>
+              <polyline points="672,478 656,494 634,516 616,536 600,556" fill="none" stroke="#FFD755" stroke-width="5" stroke-dasharray="10 10" stroke-linecap="round" style="animation:dashMove 1s linear infinite;"></polyline>
+            </svg>
+            <sc-for list="{{ trailStops }}" as="m" hint-placeholder-count="0">
+              <div style="position:absolute;left:{{ m.left }};top:{{ m.top }};transform:translate(-50%,-70%);pointer-events:none;">
+                <img src="assets/demo/map-marker.png" alt="" style="width:30px;height:30px;image-rendering:pixelated;display:block;">
+                <div style="position:absolute;left:100%;top:36%;transform:translate(4px,-50%);background:#191a1d;border:2px solid #FFD755;color:#FFD755;font-family:'VT323',monospace;font-size:0.66rem;letter-spacing:0.05em;padding:0 5px;white-space:nowrap;">{{ m.label }}</div>
+              </div>
+            </sc-for>
+            <sc-for list="{{ trailUsers }}" as="u" hint-placeholder-count="0">
+              <div style="position:absolute;left:{{ u.left }};top:{{ u.top }};transform:translate(-50%,-100%);pointer-events:none;animation:walk {{ u.dur }} ease-in-out infinite;">
+                <div style="width:26px;height:26px;image-rendering:pixelated;border-radius:50%;box-shadow:0 0 0 2px {{ u.ring }};background-image:{{ u.avCss }};background-size:cover;"></div>
+                <div style="position:absolute;left:50%;top:100%;transform:translate(-50%,2px);background:{{ u.ring }};color:#191a1d;font-family:'VT323',monospace;font-size:0.62rem;letter-spacing:0.04em;padding:0 4px;white-space:nowrap;">{{ u.name }}</div>
+              </div>
+            </sc-for>
+            <sc-for list="{{ pins }}" as="p" hint-placeholder-count="0">
+              <div onClick="{{ p.onTap }}" style="position:absolute;left:{{ p.left }};top:{{ p.top }};transform:translate(-50%,-72%);width:64px;height:64px;cursor:pointer;opacity:{{ p.opacity }};">
+                <div style="position:absolute;left:50%;top:72%;width:52px;height:26px;border-radius:50%;border:3px solid #FFD755;display:{{ p.ringShow }};animation:ringPulse 1.5s ease-out infinite;"></div>
+                <div style="position:relative;width:64px;height:64px;image-rendering:pixelated;background-image:{{ p.iconCss }};background-size:contain;background-repeat:no-repeat;"></div>
+              </div>
+            </sc-for>
+            <sc-for list="{{ pins }}" as="p" hint-placeholder-count="0">
+              <div onClick="{{ p.onTap }}" style="position:absolute;left:{{ p.left }};top:{{ p.top }};transform:translate(-50%,10px);background:#191a1d;border:2px solid {{ p.labelBorder }};color:{{ p.labelColor }};font-family:'VT323',monospace;font-size:0.72rem;letter-spacing:0.04em;padding:1px 6px;white-space:nowrap;cursor:pointer;opacity:{{ p.opacity }};display:{{ p.labelShow }};">{{ p.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="position:absolute;top:0;left:0;right:0;padding:14px 14px 26px;background:linear-gradient(180deg,rgba(10,21,34,0.85),rgba(10,21,34,0));pointer-events:none;">
+          <div style="position:relative;display:flex;align-items:flex-start;justify-content:space-between;">
+            <button onClick="{{ backHome }}" style="pointer-events:auto;width:42px;height:42px;border:none;background:none;cursor:pointer;line-height:1;padding:0;display:flex;align-items:center;justify-content:center;"><img src="assets/demo/pixel-arrow-left.png" alt="Back" style="width:38px;height:38px;image-rendering:pixelated;display:block;"></button>
+            <div style="position:absolute;left:50%;top:6px;transform:translateX(-50%);text-align:center;">
+              <div style="font-family:'VT323',monospace;color:#FFD755;font-size:1.3rem;letter-spacing:0.1em;line-height:1;">1.35°N SDB</div>
+              <div style="display:{{ personaChipShow }};align-items:center;justify-content:center;gap:5px;margin-top:5px;">
+                <div style="width:16px;height:20px;image-rendering:pixelated;background-image:{{ personaImgCss }};background-size:contain;background-repeat:no-repeat;background-position:center;"></div>
+                <div style="font-family:'VT323',monospace;color:{{ personaChipColor }};font-size:0.82rem;letter-spacing:0.1em;line-height:1;">{{ personaName }}</div>
+              </div>
+            </div>
+            <div style="pointer-events:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <div style="display:flex;align-items:center;gap:6px;background:#FFFFFF;border:2px solid #191a1d;border-radius:12px;box-shadow:0 2px 0 #25272b;padding:4px 11px;font-family:'VT323',monospace;font-size:1.05rem;color:#191a1d;letter-spacing:0.05em;box-sizing:border-box;">
+                <div style="width:22px;height:22px;margin:-5px 0 -5px -3px;flex-shrink:0;background:url('assets/demo/coin-spin.png') 0 0 no-repeat;background-size:400% 100%;image-rendering:pixelated;"></div>{{ coins }}
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;background:#FFFFFF;border:2px solid #191a1d;border-radius:12px;box-shadow:0 2px 0 #25272b;padding:4px 11px;font-family:'VT323',monospace;font-size:1.05rem;color:#191a1d;letter-spacing:0.05em;box-sizing:border-box;">
+                <span style="color:#3B5BFF;font-family:'VT323',monospace;font-size:1.35rem;line-height:1;font-weight:400;letter-spacing:0.02em;">XP</span>{{ xp }}
+              </div>
+              <div onClick="{{ openLeaderboard }}" style="position:relative;display:flex;align-items:center;gap:6px;background:#FFFFFF;border:2px solid #191a1d;border-radius:12px;box-shadow:0 2px 0 #25272b;padding:4px 11px;font-family:'VT323',monospace;font-size:1.05rem;color:#191a1d;letter-spacing:0.05em;box-sizing:border-box;cursor:pointer;">
+                <div style="position:absolute;left:50%;top:50%;width:46px;height:46px;border-radius:50%;border:3px solid #FFD755;display:{{ trophyRing }};animation:ringPulse 1.5s ease-out infinite;pointer-events:none;"></div>
+                <img src="assets/demo/pixel-trophy.png" alt="Leaderboard" style="width:20px;height:20px;margin:-4px 0 -4px -2px;image-rendering:pixelated;display:block;">{{ goingCount }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{ showHint }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;left:0;right:0;bottom:0;padding:0 0 12px;pointer-events:none;text-align:center;">
+            <div style="display:inline-block;background:rgba(10,21,34,0.7);border-radius:100px;padding:6px 14px;color:rgba(245,239,228,0.8);font-weight:700;font-size:0.68rem;font-family:'Funnel Sans',sans-serif;">Drag to explore · tap an object to open its event</div>
+          </div>
+          <div style="position:absolute;right:12px;bottom:52px;display:flex;flex-direction:column;gap:10px;">
+            <button onClick="{{ zoomIn }}" style="width:42px;height:42px;border:none;background:none;cursor:pointer;padding:0;"><img src="assets/demo/pixel-zoom-in.png" alt="Zoom in" style="width:38px;height:38px;image-rendering:pixelated;display:block;"></button>
+            <button onClick="{{ zoomOut }}" style="width:42px;height:42px;border:none;background:none;cursor:pointer;padding:0;"><img src="assets/demo/pixel-zoom-out.png" alt="Zoom out" style="width:38px;height:38px;image-rendering:pixelated;display:block;"></button>
+          </div>
+        </sc-if>
+
+        <!-- OPEN STUDIO overlay -->
+        <sc-if value="{{ studioOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ closeStudioModal }}" style="position:absolute;left:0;right:0;top:0;bottom:{{ overlayBottom }};display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(10,21,34,0.72);">
+            <div style="width:100%;max-width:330px;max-height:100%;min-height:0;display:flex;flex-direction:column;background:#F1ECE1;border:3px solid #FFFFFF;box-shadow:0 6px 0 #2c2e33;animation:fadeUp 0.3s ease both;box-sizing:border-box;overflow:hidden;">
+              <div style="position:relative;flex:1 1 auto;min-height:60px;">
+                <img src="assets/demo/studio-photo.jpg" alt="Open studio" style="width:100%;height:100%;object-fit:cover;display:block;">
+                <button onClick="{{ closeStudioModal }}" style="position:absolute;top:8px;right:8px;display:{{ studioCloseShow }};background:rgba(10,21,34,0.75);border:2px solid #FFFFFF;color:#f3f3ef;font-family:'VT323',monospace;font-size:1.1rem;line-height:1;padding:3px 9px;cursor:pointer;">✕</button>
+              </div>
+              <div style="flex:0 0 auto;padding:12px 14px 14px;font-family:'VT323',monospace;">
+                <div style="color:#8A8078;font-size:0.92rem;letter-spacing:0.12em;">OPEN STUDIOS · ISLAND-WIDE</div>
+                <div style="color:#191a1d;font-size:1.45rem;line-height:1.15;margin-top:2px;">STUDIO SEMULA · WORKSHOP TOUR</div>
+                <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+                  <div style="border:2px solid #191a1d;background:#FFFFFF;color:#191a1d;font-size:0.9rem;letter-spacing:0.06em;padding:2px 8px;">6 PHOTOS</div>
+                  <div style="border:2px solid #191a1d;background:#FFFFFF;color:#191a1d;font-size:0.9rem;letter-spacing:0.06em;padding:2px 8px;">12 SLIDES</div>
+                  <div style="border:2px solid #191a1d;background:#FFD755;color:#191a1d;font-size:0.9rem;letter-spacing:0.06em;padding:2px 8px;">▶ 2 MIN VIDEO</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- DESIGN DIALOGUES live feed -->
+        <sc-if value="{{ feedOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:0;right:0;top:0;bottom:{{ overlayBottom }};background:rgba(10,21,34,0.94);display:flex;flex-direction:column;box-sizing:border-box;padding:14px 12px 10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;font-family:'VT323',monospace;flex-shrink:0;">
+              <div>
+                <div style="color:#FFD755;font-size:1.3rem;letter-spacing:0.06em;line-height:1;">DESIGN DIALOGUES</div>
+                <div style="color:#a9adb4;font-size:0.92rem;letter-spacing:0.1em;margin-top:3px;">LIVE THREAD · 342 IN THE ROOM</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="display:flex;align-items:center;gap:5px;color:#f3f3ef;font-size:0.95rem;letter-spacing:0.08em;"><span style="width:8px;height:8px;background:#4ADE80;border-radius:50%;display:inline-block;"></span>LIVE</div>
+                <button onClick="{{ closeFeed }}" style="display:{{ feedCloseShow }};background:none;border:2px solid #5c616b;color:#b4b8bf;font-family:'VT323',monospace;font-size:1rem;padding:1px 8px;cursor:pointer;">✕</button>
+              </div>
+            </div>
+            <div ref="{{ feedRef }}" style="flex:1;min-height:0;overflow-y:auto;margin-top:10px;display:flex;flex-direction:column;gap:8px;padding-right:2px;">
+              <sc-for list="{{ feedList }}" as="m" hint-placeholder-count="0">
+                <div style="display:flex;gap:8px;align-items:flex-start;animation:msgIn 0.28s ease both;">
+                  <div style="width:26px;height:26px;flex-shrink:0;border-radius:50%;image-rendering:pixelated;box-shadow:0 0 0 2px {{ m.ring }};background-image:{{ m.avCss }};background-size:cover;"></div>
+                  <div style="flex:1;background:{{ m.bg }};border:2px solid {{ m.border }};padding:6px 9px 7px;">
+                    <div style="font-family:'VT323',monospace;font-size:0.88rem;letter-spacing:0.06em;color:{{ m.nameColor }};">{{ m.name }} · {{ m.time }}</div>
+                    <div style="font-family:'Funnel Sans',sans-serif;font-size:0.82rem;font-weight:600;line-height:1.45;color:{{ m.textColor }};margin-top:2px;">{{ m.text }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex-shrink:0;display:flex;gap:8px;margin-top:10px;">
+              <input value="{{ draft }}" onChange="{{ onDraft }}" placeholder="Add your thought…" style="flex:1;min-width:0;background:#191a1d;border:2px solid #5c616b;color:#f3f3ef;font-family:'Funnel Sans',sans-serif;font-size:0.82rem;font-weight:600;padding:9px 10px;outline:none;box-sizing:border-box;">
+              <button onClick="{{ sendMsg }}" style="flex-shrink:0;background:#FFD755;border:2px solid #FFFFFF;color:#191a1d;font-family:'VT323',monospace;font-size:1.05rem;letter-spacing:0.08em;padding:0 14px;cursor:pointer;">SEND</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- LEADERBOARD -->
+        <sc-if value="{{ lbOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:0;right:0;top:0;bottom:{{ overlayBottom }};background:rgba(10,21,34,0.94);display:flex;flex-direction:column;box-sizing:border-box;padding:14px 12px 10px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;font-family:'VT323',monospace;flex-shrink:0;">
+              <div>
+                <div style="color:#FFD755;font-size:1.3rem;letter-spacing:0.06em;line-height:1;">TEAM LEADERBOARD</div>
+                <div style="color:#a9adb4;font-size:0.92rem;letter-spacing:0.1em;margin-top:3px;">{{ goingCount }} JOINED · 2,140 TEAMS</div>
+              </div>
+              <button onClick="{{ closeLb }}" style="background:none;border:2px solid #5c616b;color:#b4b8bf;font-family:'VT323',monospace;font-size:1rem;padding:1px 8px;cursor:pointer;">✕</button>
+            </div>
+            <div style="flex:1;min-height:0;overflow-y:auto;margin-top:12px;display:flex;flex-direction:column;gap:7px;">
+              <sc-for list="{{ teams }}" as="t" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:10px;background:{{ t.bg }};border:2px solid {{ t.border }};padding:8px 10px;">
+                  <div style="width:26px;flex-shrink:0;text-align:center;font-family:'VT323',monospace;font-size:1.3rem;line-height:1;color:{{ t.rankColor }};">{{ t.rank }}</div>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-family:'VT323',monospace;font-size:1.1rem;letter-spacing:0.04em;color:{{ t.nameColor }};line-height:1.1;">{{ t.name }}</div>
+                    <div style="font-family:'VT323',monospace;font-size:0.85rem;letter-spacing:0.08em;color:#8a9099;margin-top:2px;">{{ t.members }} MEMBERS · {{ t.note }}</div>
+                  </div>
+                  <div style="flex-shrink:0;text-align:right;font-family:'VT323',monospace;">
+                    <div style="font-size:1.15rem;color:{{ t.xpColor }};line-height:1;">{{ t.xp }}</div>
+                    <div style="font-size:0.78rem;color:#8a9099;letter-spacing:0.1em;">XP</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex-shrink:0;margin-top:10px;border-top:1px solid rgba(245,239,228,0.16);padding-top:9px;font-family:'VT323',monospace;color:#a9adb4;font-size:0.92rem;letter-spacing:0.06em;line-height:1.35;">TEAMS OF UP TO 5. TOP 3 AT THE CLOSE SHARE 250,000 COINS + PARTNER REWARDS.</div>
+          </div>
+        </sc-if>
+
+        <!-- bottom stack: check-in card + soot tour box -->
+        <div style="position:absolute;left:12px;right:12px;bottom:14px;display:flex;flex-direction:column;gap:10px;pointer-events:none;">
+          <sc-if value="{{ checkinCard }}" hint-placeholder-val="{{ false }}">
+            <div style="pointer-events:auto;background:#FFFFFF;border:3px solid #191a1d;box-shadow:0 4px 0 #25272b;padding:11px 13px;display:flex;align-items:center;gap:11px;animation:fadeUp 0.3s ease both;margin-right:{{ cardRight }};">
+              <img src="assets/demo/obj-monument.png" alt="" style="width:44px;height:44px;image-rendering:pixelated;flex-shrink:0;">
+              <div style="flex:1;min-width:0;">
+                <div style="font-family:'VT323',monospace;font-size:0.88rem;letter-spacing:0.1em;color:#8A8078;">{{ checkinKicker }}</div>
+                <div style="font-family:'Funnel Sans',sans-serif;font-weight:900;font-size:0.95rem;color:#1A1A1A;line-height:1.2;">Futures of Living</div>
+                <div style="font-family:'Funnel Sans',sans-serif;font-weight:700;font-size:0.72rem;color:#8A8078;margin-top:1px;">National Design Centre · Hall 1</div>
+              </div>
+              <button onClick="{{ checkinTap }}" style="flex-shrink:0;background:{{ checkinBg }};border:2px solid #191a1d;box-shadow:0 3px 0 {{ checkinShadow }};color:{{ checkinColor }};font-family:'VT323',monospace;font-size:1.05rem;letter-spacing:0.06em;padding:8px 11px;cursor:pointer;line-height:1.1;text-align:center;white-space:pre-line;">{{ checkinLabel }}</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ tourBox }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ sootTap }}" style="pointer-events:auto;position:relative;background:#191a1d;border:3px solid #FFFFFF;border-radius:12px;box-shadow:0 6px 0 #2c2e33,0 14px 22px rgba(0,0,0,0.45);padding:26px 18px 30px;font-family:'VT323',monospace;cursor:pointer;">
+              <div style="position:absolute;top:-62px;right:16px;width:84px;height:84px;background:#F1ECE1;border:3px solid #FFFFFF;border-radius:8px;box-shadow:0 3px 0 #25272b;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;">
+                <div role="img" aria-label="Soot" style="width:78px;height:78px;margin-bottom:1px;background:url('assets/demo/soot-sprite.png') 0 0 no-repeat;background-size:936px 78px;image-rendering:pixelated;animation:sootIdle 4.2s steps(12) infinite;"></div>
+              </div>
+              <div style="position:absolute;top:0;left:18px;transform:translateY(-50%);background:#191a1d;border:3px solid #FFFFFF;border-radius:5px;box-shadow:0 3px 0 #25272b;padding:3px 11px;color:#f3f3ef;font-size:0.95rem;text-transform:uppercase;letter-spacing:0.07em;line-height:1.2;">SOOT · YOUR GUIDE</div>
+              <div style="color:#a9adb4;font-size:0.9rem;letter-spacing:0.14em;margin-bottom:6px;padding-right:70px;">{{ sootHeader }}</div>
+              <div style="color:#f3f3ef;font-size:1.3rem;line-height:1.35;min-height:78px;">{{ sootShown }}<span style="display:{{ sootCursor }};animation:cursorBlink 0.8s step-end infinite;">▌</span></div>
+              <sc-if value="{{ sootBtn }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ sootNext }}" style="width:100%;margin-top:12px;background:{{ sootBtnBg }};border:3px solid #FFFFFF;border-radius:8px;box-shadow:0 4px 0 {{ sootBtnShadow }};color:{{ sootBtnColor }};font-family:'VT323',monospace;font-size:1.3rem;letter-spacing:0.1em;padding:9px 0;cursor:pointer;">{{ sootBtnLabel }}</button>
+              </sc-if>
+              <div style="position:absolute;bottom:8px;left:18px;color:#FFD755;font-size:0.95rem;letter-spacing:0.1em;">{{ sootHint }}</div>
+              <div style="position:absolute;bottom:8px;right:16px;color:#6b7078;font-size:0.9rem;letter-spacing:0.1em;">{{ sootProgress }}</div>
+            </div>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:50%;top:120px;transform:translateX(-50%);background:#FFD755;border:3px solid #FFFFFF;box-shadow:0 4px 0 #b1932f;color:#191a1d;font-family:'VT323',monospace;font-size:1.3rem;letter-spacing:0.08em;padding:7px 16px;animation:toastUp 1.8s ease forwards;pointer-events:none;">{{ toastText }}</div>
+        </sc-if>
+
+        <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(0,0,0,0.35);"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;background:#FFFFFF;border-radius:24px 24px 0 0;padding:10px 18px 22px;animation:panelIn 0.26s cubic-bezier(0.34,1.2,0.64,1);font-family:'Funnel Sans',sans-serif;">
+            <div style="width:40px;height:4px;border-radius:2px;background:#EDE3D4;margin:0 auto 14px;"></div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="background:{{ sheetColor }};color:#191a1d;font-family:'VT323',monospace;font-size:0.95rem;letter-spacing:0.08em;padding:2px 9px;border:2px solid #191a1d;">{{ sheetType }}</div>
+              <div style="font-weight:700;color:#8A8078;font-size:0.75rem;">{{ sheetDates }}</div>
+              <div style="margin-left:auto;display:{{ sheetTagShow }};align-items:center;gap:5px;background:{{ sheetTagBg }};color:{{ sheetTagColor }};font-family:'VT323',monospace;font-size:0.85rem;letter-spacing:0.06em;padding:2px 8px;border:2px solid {{ sheetTagBorder }};">{{ sheetTagLabel }}</div>
+            </div>
+            <div style="font-weight:900;color:#1A1A1A;font-size:1.35rem;line-height:1.15;margin-top:10px;">{{ sheetTitle }}</div>
+            <div style="font-weight:700;color:#8A8078;font-size:0.82rem;margin-top:3px;">{{ sheetOrg }} · {{ sheetDistrict }}</div>
+            <div style="font-weight:600;color:#4A4A4A;font-size:0.88rem;line-height:1.55;margin-top:10px;">{{ sheetDesc }}</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">
+              <sc-if value="{{ sheetHasSpace }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ openSpace }}" style="width:100%;padding:13px 0;border-radius:100px;border:none;background:#253FF6;color:white;font-family:'Funnel Sans',sans-serif;font-weight:800;font-size:0.9rem;cursor:pointer;">Enter event space</button>
+              </sc-if>
+              <sc-if value="{{ sheetHasGallery }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ openStudioModal }}" style="width:100%;padding:13px 0;border-radius:100px;border:none;background:#253FF6;color:white;font-family:'Funnel Sans',sans-serif;font-weight:800;font-size:0.9rem;cursor:pointer;">View studio space</button>
+              </sc-if>
+              <sc-if value="{{ sheetHasFeed }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ openFeedBtn }}" style="width:100%;padding:13px 0;border-radius:100px;border:none;background:#253FF6;color:white;font-family:'Funnel Sans',sans-serif;font-weight:800;font-size:0.9rem;cursor:pointer;">Open live thread</button>
+              </sc-if>
+              <sc-if value="{{ sheetHasRoute }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ toggleRoute }}" style="width:100%;padding:13px 0;border-radius:100px;border:none;background:#253FF6;color:white;font-family:'Funnel Sans',sans-serif;font-weight:800;font-size:0.9rem;cursor:pointer;">{{ routeBtnLabel }}</button>
+              </sc-if>
+              <sc-if value="{{ sheetHasQuest }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ startQuest }}" style="width:100%;padding:13px 0;border-radius:100px;border:1.5px solid #1A1A1A;background:{{ questBtnBg }};color:{{ questBtnColor }};font-family:'Funnel Sans',sans-serif;font-weight:800;font-size:0.9rem;cursor:pointer;">{{ questBtnLabel }}</button>
+              </sc-if>
+              <sc-if value="{{ sheetHasNotify }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ notifyEvent }}" style="width:100%;padding:13px 0;border-radius:100px;border:1.5px solid #EDE3D4;background:{{ notifyBg }};color:{{ notifyColor }};font-family:'Funnel Sans',sans-serif;font-weight:800;font-size:0.9rem;cursor:pointer;">{{ notifyLabel }}</button>
+              </sc-if>
+            </div>
+            <div style="margin-top:14px;text-align:center;font-weight:700;color:#A79C8D;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;">Event space by {{ sheetOrg }} · powered by Rally AI</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ routePanel }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:12px;right:12px;bottom:12px;background:#191a1d;border:3px solid #FFFFFF;border-radius:12px;box-shadow:0 6px 0 #2c2e33;padding:14px 16px;font-family:'VT323',monospace;animation:panelIn 0.26s ease;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="color:#FFD755;font-size:1.15rem;letter-spacing:0.1em;">CIVIC DISTRICT TRAIL · 3 STOPS</div>
+              <button onClick="{{ toggleRoute }}" style="background:none;border:none;color:#b4b8bf;font-family:'VT323',monospace;font-size:1.1rem;cursor:pointer;">✕</button>
+            </div>
+            <sc-for list="{{ routeStops }}" as="r" hint-placeholder-count="3">
+              <div style="display:flex;gap:10px;align-items:baseline;margin-top:7px;">
+                <div style="color:#FFD755;font-size:1rem;">{{ r.n }}</div>
+                <div style="color:#f3f3ef;font-size:1.05rem;">{{ r.name }}</div>
+                <div style="color:#a9adb4;font-size:0.9rem;margin-left:auto;">{{ r.note }}</div>
+              </div>
+            </sc-for>
+            <div style="color:#a9adb4;font-size:0.9rem;margin-top:10px;">STORIES UNLOCK AS YOU GET CLOSE. WALK IT ANY DAY.</div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ EVENT SPACE (floor plan) ============ -->
+    <sc-if value="{{ isSpace }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:#191a1d;display:flex;flex-direction:column;font-family:'VT323',monospace;">
+        <div style="padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+          <button onClick="{{ closeSpace }}" style="background:none;border:2px solid #9498a0;border-radius:6px;color:#f3f3ef;font-family:'VT323',monospace;font-size:1rem;padding:3px 10px;cursor:pointer;">‹ MAP</button>
+          <div style="color:#a9adb4;font-size:0.95rem;letter-spacing:0.12em;">EXHIBITION FLOOR</div>
+        </div>
+        <div style="padding:4px 18px 0;flex-shrink:0;">
+          <div style="color:#FFD755;font-size:1.6rem;letter-spacing:0.06em;line-height:1.1;">FUTURES OF LIVING</div>
+          <div style="color:#a9adb4;font-size:1rem;margin-top:2px;">NATIONAL DESIGN CENTRE · HALL 1 · UPLOADED BY ORGANISER</div>
+        </div>
+        <div style="flex:1;min-height:0;padding:14px 18px;display:flex;">
+          <div style="position:relative;flex:1;border:3px solid #9498a0;background:#20222a;">
+            <div style="position:absolute;left:8%;top:8%;width:38%;height:34%;border:2px solid #5c616b;"></div>
+            <div style="position:absolute;left:54%;top:8%;width:38%;height:34%;border:2px solid #5c616b;"></div>
+            <div style="position:absolute;left:8%;top:50%;width:84%;height:42%;border:2px solid #5c616b;"></div>
+            <div style="position:absolute;left:46%;top:42%;width:8%;height:8%;background:#20222a;border-left:2px solid #5c616b;border-right:2px solid #5c616b;"></div>
+            <div style="position:absolute;left:2%;top:44%;color:#5c616b;font-size:0.85rem;letter-spacing:0.1em;transform:rotate(-90deg);transform-origin:left;">ENTRANCE ▲</div>
+            <sc-for list="{{ booths }}" as="b" hint-placeholder-count="4">
+              <div onClick="{{ b.onTap }}" style="position:absolute;left:{{ b.left }};top:{{ b.top }};transform:translate(-50%,-50%);width:34px;height:34px;background:{{ b.bg }};border:3px solid #FFFFFF;box-shadow:0 3px 0 rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:#191a1d;font-size:1.2rem;cursor:pointer;">{{ b.n }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <sc-if value="{{ boothOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="margin:0 12px 10px;background:#191a1d;border:3px solid #FFFFFF;border-radius:10px;box-shadow:0 5px 0 #2c2e33;padding:12px 14px;animation:panelIn 0.22s ease;flex-shrink:0;">
+            <div style="color:#FFD755;font-size:1.15rem;">{{ boothTitle }}</div>
+            <div style="color:#f3f3ef;font-size:1.05rem;line-height:1.4;margin-top:4px;">{{ boothStory }}</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ spaceTourBox }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ sootTap }}" style="margin:0 12px 14px;position:relative;background:#191a1d;border:3px solid #FFFFFF;border-radius:12px;box-shadow:0 6px 0 #2c2e33;padding:24px 18px 26px;font-family:'VT323',monospace;cursor:pointer;flex-shrink:0;">
+            <div style="position:absolute;top:-62px;right:16px;width:84px;height:84px;background:#F1ECE1;border:3px solid #FFFFFF;border-radius:8px;box-shadow:0 3px 0 #25272b;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;">
+              <div role="img" aria-label="Soot" style="width:78px;height:78px;margin-bottom:1px;background:url('assets/demo/soot-sprite.png') 0 0 no-repeat;background-size:936px 78px;image-rendering:pixelated;animation:sootIdle 4.2s steps(12) infinite;"></div>
+            </div>
+            <div style="color:#a9adb4;font-size:0.9rem;letter-spacing:0.14em;margin-bottom:5px;padding-right:66px;">{{ sootHeader }}</div>
+            <div style="color:#f3f3ef;font-size:1.25rem;line-height:1.35;min-height:56px;">{{ sootShown }}<span style="display:{{ sootCursor }};animation:cursorBlink 0.8s step-end infinite;">▌</span></div>
+            <sc-if value="{{ sootBtn }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ sootNext }}" style="width:100%;margin-top:12px;background:{{ sootBtnBg }};border:3px solid #FFFFFF;border-radius:8px;box-shadow:0 4px 0 {{ sootBtnShadow }};color:{{ sootBtnColor }};font-family:'VT323',monospace;font-size:1.25rem;letter-spacing:0.1em;padding:8px 0;cursor:pointer;">{{ sootBtnLabel }}</button>
+            </sc-if>
+          </div>
+        </sc-if>
+        <sc-if value="{{ spaceQuestBtn }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:0 18px 20px;flex-shrink:0;">
+            <button onClick="{{ startQuest }}" style="width:100%;background:#FFD755;border:3px solid #FFFFFF;border-radius:8px;box-shadow:0 4px 0 #b1932f;color:#191a1d;font-family:'VT323',monospace;font-size:1.3rem;letter-spacing:0.08em;padding:11px 0;cursor:pointer;">{{ spaceQuestLabel }}</button>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ QUEST ============ -->
+    <sc-if value="{{ isQuest }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:#F1ECE1;display:flex;flex-direction:column;font-family:'Funnel Sans',sans-serif;">
+        <sc-if value="{{ questActive }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:18px 18px 10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <button onClick="{{ quitQuest }}" style="background:none;border:none;color:#8A8078;font-weight:800;font-size:0.8rem;cursor:pointer;font-family:'Funnel Sans',sans-serif;padding:0;">✕ Exit</button>
+              <div style="font-weight:800;color:#8A8078;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;">Check-out quest · Futures of Living</div>
+              <div style="font-weight:800;color:#1A1A1A;font-size:0.8rem;">{{ questStep }}</div>
+            </div>
+            <div style="height:8px;background:#FFFFFF;border-radius:100px;margin-top:12px;overflow:hidden;">
+              <div style="height:100%;width:{{ questPct }};background:#253FF6;border-radius:100px;transition:width 0.3s ease;"></div>
+            </div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:8px 18px 18px;">
+            <div style="background:#FFFFFF;border-radius:20px;padding:20px 18px;box-shadow:0 2px 10px rgba(26,26,26,0.05);">
+              <div style="font-weight:800;color:#8A8078;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;">{{ qKicker }}</div>
+              <div style="font-weight:900;color:#1A1A1A;font-size:1.2rem;line-height:1.3;margin-top:6px;">{{ qText }}</div>
+              <sc-if value="{{ qIsChoice }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;">
+                  <sc-for list="{{ qOptions }}" as="o" hint-placeholder-count="4">
+                    <button onClick="{{ o.onTap }}" style="text-align:left;padding:13px 14px;border-radius:16px;border:1.5px solid {{ o.border }};background:{{ o.bg }};color:#1A1A1A;font-family:'Funnel Sans',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;">{{ o.label }}</button>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ qIsRating }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding:0 4px;">
+                  <sc-for list="{{ qRatings }}" as="o" hint-placeholder-count="5">
+                    <button onClick="{{ o.onTap }}" style="width:50px;height:50px;border-radius:16px;border:1.5px solid {{ o.border }};background:{{ o.bg }};font-size:1.05rem;cursor:pointer;font-family:'Funnel Sans',sans-serif;font-weight:900;color:#1A1A1A;">{{ o.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:8px;padding:0 6px;font-size:0.95rem;"><span>🙁</span><span>😊</span></div>
+              </sc-if>
+            </div>
+            <div style="margin-top:10px;text-align:center;font-weight:700;color:#A79C8D;font-size:0.68rem;">Your answer goes straight to the organiser's insights — anonymised.</div>
+          </div>
+          <div style="padding:0 18px 22px;">
+            <button onClick="{{ questNext }}" disabled="{{ nextDisabled }}" style="width:100%;padding:15px 0;border-radius:100px;border:none;background:{{ nextBg }};color:white;font-family:'Funnel Sans',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;">{{ nextLabel }}</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ questDone }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;">
+            <div style="width:110px;height:110px;background:url('assets/demo/coin-spin.png') 0 0 no-repeat;background-size:400% 100%;image-rendering:pixelated;animation:coinPop 0.7s cubic-bezier(0.34,1.4,0.64,1) both, coinSpin 0.9s steps(4) infinite 0.7s;"></div>
+            <div style="font-weight:900;color:#1A1A1A;font-size:2rem;line-height:1.2;white-space:nowrap;margin-top:18px;animation:fadeUp 0.5s ease 0.25s both;">+{{ rewardXp }} XP</div>
+            <div style="font-weight:800;color:#8A8078;font-size:0.95rem;line-height:1.3;white-space:nowrap;margin-top:4px;animation:fadeUp 0.5s ease 0.3s both;">and +{{ rewardCoins }} coins</div>
+            <div style="font-weight:600;color:#4A4A4A;font-size:0.92rem;line-height:1.55;margin-top:10px;max-width:270px;animation:fadeUp 0.5s ease 0.4s both;">Checked out. Coins become real rewards; XP counts towards your team.</div>
+            <div style="position:relative;margin-top:16px;background:#FFFFFF;border:1.5px solid #EDE3D4;border-radius:16px;padding:12px 16px;max-width:290px;animation:fadeUp 0.5s ease 0.55s both;">
+              <div role="img" aria-label="Soot" style="position:absolute;left:-34px;bottom:6px;width:46px;height:52px;overflow:hidden;">
+                <div style="width:78px;height:78px;margin:-13px 0 0 -14px;background:url('assets/demo/soot-sprite.png') 0 0 no-repeat;background-size:936px 78px;image-rendering:pixelated;animation:sootIdle 4.2s steps(12) infinite;"></div>
+              </div>
+              <div style="font-weight:800;color:#8A8078;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;">Meanwhile, at the organiser's side</div>
+              <div style="font-weight:700;color:#1A1A1A;font-size:0.82rem;margin-top:5px;line-height:1.5;">Your responses just joined their live insight dashboard — attendance, sentiment, and what to improve for the next edition.</div>
+            </div>
+            <button onClick="{{ backToMap }}" style="margin-top:26px;width:100%;max-width:300px;padding:15px 0;border-radius:100px;border:none;background:#253FF6;color:white;font-family:'Funnel Sans',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;animation:fadeUp 0.5s ease 0.7s both;">Back to the map</button>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 410, &quot;height&quot;: 880}, &quot;liveMode&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Campaign&quot;}, &quot;skipIntro&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Campaign&quot;}, &quot;guidedTour&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Campaign&quot;}, &quot;jumpToNarrative&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Campaign&quot;}, &quot;questCoins&quot;: {&quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 30, &quot;min&quot;: 5, &quot;max&quot;: 100, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Quest&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let seed = 13; const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+    this._stars = Array.from({ length: 42 }, () => ({
+      left: (rnd() * 100).toFixed(1) + '%', top: (rnd() * 100).toFixed(1) + '%',
+      size: (rnd() < 0.2 ? 4 : 2) + 'px', color: rnd() < 0.25 ? '#FFD755' : 'rgba(245,239,228,0.8)',
+      dur: (1.6 + rnd() * 2.4).toFixed(2) + 's', delay: (rnd() * 3).toFixed(2) + 's',
+    }));
+    this._events = [
+      { id: 'ndc', type: 'EXHIBITION', color: '#5BE1FF', icon: 'assets/demo/obj-monument.png', x: 38.0, y: 41.0, label: 'FUTURES OF LIVING', title: 'Futures of Living', org: 'National Design Centre', district: 'Bras Basah.Bugis', dates: '14 May – 20 Jun', desc: 'The flagship open-call exhibition on how we live, make and relate at 1.35°N. Walk the uploaded floor plan, meet the studios, and complete the visitor quest.', space: true, quest: true },
+      { id: 'tour', type: 'TOUR', color: '#5BE1FF', icon: 'assets/demo/obj-trail.png', x: 36.0, y: 57.5, label: 'CIVIC DESIGN TRAIL', title: 'Civic District Design Trail', org: 'Guided & self-paced', district: 'Bras Basah.Bugis → Marina Bay', dates: 'Daily', desc: 'A walking trail linking three design landmarks. Follow a real guide or a digital one — stories unlock as you get close, and the route draws itself on the island.', route: true },
+      { id: 'talks', type: 'TALKS', color: '#5BE1FF', icon: 'assets/demo/obj-dialogues.png', x: 42.0, y: 48.0, label: 'DESIGN DIALOGUES', title: 'Design Dialogues', org: 'Biennale Forum stage', district: 'Marina Bay', dates: 'Thu – Sat', desc: 'Talks and panels streamed live into the map, with a thread that runs before, during and after the session. The best questions go to the speakers on stage.', feed: true, notify: true },
+      { id: 'studio', type: 'STUDIO', color: '#5BE1FF', icon: 'assets/demo/obj-studio.png', x: 27.5, y: 43.0, label: 'OPEN STUDIOS', title: 'Open Studios', org: 'Studios across the island', district: 'Island-wide', dates: 'Weekends', desc: 'Designers and fabricators open their workshops. Each studio uploads its own space — photos, slides or a short film — and rallies its own audience to the door.', gallery: true, notify: true },
+    ];
+    const ALL = ['design', 'business', 'innovator', 'culture'];
+    this._events.forEach(e => { e.for = ALL; });
+    this._events = this._events.concat([
+      { id: 'kids', type: 'WORKSHOP', color: '#5BE1FF', icon: 'assets/demo/obj-studio.png', x: 40.0, y: 31.5, label: 'KIDS DESIGN LAB', title: 'Kids Design Lab', org: 'Science Centre', district: 'Jurong', dates: 'Sat & Sun', desc: 'Hands-on making for 6–12s. Build a neighbourhood out of offcuts, then vote on what your street needs next.', for: ['innovator'], notify: true },
+      { id: 'forum', type: 'FORUM', color: '#5BE1FF', icon: 'assets/demo/obj-dialogues.png', x: 44.5, y: 36.0, label: 'DESIGN × BUSINESS', title: 'Design × Business Forum', org: 'Enterprise Singapore', district: 'Marina Bay', dates: '22 May', desc: 'How firms put design to work: procurement, in-house teams, and what it returns. For leaders and decision makers.', for: ['business'], notify: true },
+      { id: 'craft', type: 'MARKET', color: '#5BE1FF', icon: 'assets/demo/obj-monument.png', x: 29.0, y: 33.0, label: 'CRAFT MARKET', title: 'Makers & Craft Market', org: 'Tiong Bahru collectives', district: 'Tiong Bahru', dates: 'Weekends', desc: 'Forty makers, one street. Buy direct, watch the work happen, and talk to the person who made it.', for: ['culture', 'innovator'], notify: true },
+      { id: 'clinic', type: 'CLINIC', color: '#5BE1FF', icon: 'assets/demo/obj-studio.png', x: 44.0, y: 56.5, label: 'PORTFOLIO CLINIC', title: 'Portfolio Clinic', org: 'Design Business Chamber', district: 'Bras Basah.Bugis', dates: 'Fri evenings', desc: 'Twenty-minute reviews with practising designers and educators. For students and designers growing a practice.', for: ['design'], notify: true },
+      { id: 'film', type: 'SCREENING', color: '#5BE1FF', icon: 'assets/demo/obj-dialogues.png', x: 30.0, y: 51.5, label: 'DESIGN FILM NIGHT', title: 'Design Film Night', org: 'The Projector', district: 'Kallang', dates: 'Wed', desc: 'Four short films on the people behind the objects, with the directors in the room afterwards.', for: ['culture'], notify: true },
+    ]);
+    this._personas = [
+      { id: 'design', name: 'DESIGNER', img: 'assets/demo/persona-design.png', color: '#2FBF4F', blurb: 'People who pursue design as a professional practice' },
+      { id: 'business', name: 'BUSINESS PROFESSIONAL', img: 'assets/demo/persona-business.png', color: '#2E9BD6', blurb: 'People who invest in design, or apply design principles at work' },
+      { id: 'innovator', name: 'EVERYDAY INNOVATORS', img: 'assets/demo/persona-innovator.png', color: '#E8452C', blurb: 'People who use design to better their lives and communities' },
+      { id: 'culture', name: 'CULTURE SEEKERS', img: 'assets/demo/persona-culture.png', color: '#B08BE8', blurb: 'People who engage with culture through good design' },
+    ];
+    this._pIntro = 'Let me recommend you what to go for based on your persona. Which one sounds like you?';
+    this._dialog = [
+      { header: 'TRANSMISSION · 01', body: "Meow. I'm Soot — your guide to 1.35°N. That's our latitude… and the name of Singapore's first Design Biennale." },
+      { header: 'THE ISLAND · 02', body: 'From 14 May to 20 Jun 2027, the whole island becomes a design playground — exhibitions, tours, installations, workshops.' },
+      { header: 'HOW IT WORKS · 03', body: "I've marked every event on my map. Get close to unlock stories, complete quests, earn coins — they become real rewards." },
+      { header: 'BEFORE OPENING DAY · 04', body: 'The map is already alive. Join now, follow the build-up, and be first in when the island lights up.' },
+    ];
+    this._tour = [
+      { h: 'WELCOME · 01', b: "The bright ones are picked for your community — the dim ones belong to another. Four are running right now. Start with the white building — tap OPEN STUDIOS.", need: 'pin:studio', hint: '▸ TAP THE WHITE STUDIO' },
+      { h: 'OPEN STUDIOS · 02', b: 'Every partner gets a space like this. Studios upload photos, slides or a two-minute film, record what they are making, and rally their own audience to the door.', btn: 'GOT IT ▸' },
+      { h: 'NEXT · 03', b: 'Now the folded map, down the coast. Tap CIVIC DESIGN TRAIL.', need: 'pin:tour', hint: '▸ TAP THE FOLDED MAP' },
+      { h: 'CIVIC DESIGN TRAIL · 04', b: 'Trails run live. Follow a real guide or a digital one — stops unlock as you reach them, and you can see who else is walking the route with you.', btn: 'NEXT ▸' },
+      { h: 'NEXT · 05', b: 'Tap the curved monument — FUTURES OF LIVING.', need: 'pin:ndc', hint: '▸ TAP THE MONUMENT' },
+      { h: 'INSIDE THE HALL · 06', b: 'Organisers upload their floor plan. Visitors tap any booth to read its story — before, during, or long after the show.', btn: 'BACK TO MAP ▸' },
+      { h: 'NEXT · 07', b: 'Last one. Tap the two speech boxes — DESIGN DIALOGUES.', need: 'pin:talks', hint: '▸ TAP THE SPEECH BOXES' },
+      { h: 'DESIGN DIALOGUES · 08', b: 'The conversation starts before the panel does. Anyone can post, and the room collects ideas from the people who never make it into the room.', btn: 'NEXT ▸' },
+      { h: 'EVERY EVENT · 09', b: 'Every event runs the same loop. You are at Futures of Living right now — check in to log the visit.', need: 'checkin', hint: '▸ TAP CHECK IN' },
+      { h: 'CHECKED IN · 10', b: '+40 XP. Check-ins tell the organiser who actually turned up, live, without a clipboard at the door.', btn: 'NEXT ▸' },
+      { h: 'ON THE WAY OUT · 11', b: 'Check out and answer a short Rally quest — the same format our merchants use. Two minutes, real feedback, more XP.', need: 'checkout', hint: '▸ TAP CHECK OUT' },
+      { h: '', b: '', need: 'quest' },
+      { h: 'LEADERBOARD · 12', b: 'Nice haul. Tap the trophy up top and see where that lands you.', need: 'leaderboard', hint: '▸ TAP THE TROPHY' },
+      { h: 'TEAMS · 13', b: 'XP is a team sport. Rally up to five people into a team. The top three at the close of the Biennale take coins and partner rewards.', btn: 'NEXT ▸' },
+      { h: 'THAT IS RALLY · 14', b: 'One map, one loop: discover, check in, respond, earn. SDB becomes easier to grasp and easier to join — and every answer becomes intelligence, read back against the four communities Design 2035 set out to grow.', btn: 'EXPLORE ON MY OWN ▸', last: true },
+    ];
+    this._booths = [
+      { n: '1', x: 27, y: 25, title: 'STUDIO SEMULA', story: 'Furniture for dense living — one flat, twelve configurations. Made from retired HDB doors.' },
+      { n: '2', x: 73, y: 25, title: 'ATELIER 1.35', story: 'Cooling textiles woven for the equator. Touch the wall that stays 4°C below the room.' },
+      { n: '3', x: 30, y: 71, title: 'FIBRE LAB', story: 'Food futures — packaging grown from mycelium in 6 days, composted in 30.' },
+      { n: '4', x: 70, y: 71, title: 'KAMPUNG VERTICAL', story: 'A 40-storey kampung, prototyped at 1:20. Neighbours share the balcony farms.' },
+    ];
+    this._questions = [
+      { kicker: 'Question 1 · About your visit', text: 'What brought you to the Biennale today?', kind: 'choice', options: ['First time exploring', 'Following a specific event', 'With friends or family', 'Design industry visit'] },
+      { kicker: 'Question 2 · Rate it', text: 'How inspiring was Futures of Living?', kind: 'rating' },
+      { kicker: 'Question 3 · Shape the next edition', text: 'Which theme should SDB explore deeper?', kind: 'choice', options: ['Living with heat', 'Density & housing', 'Food futures', 'Craft & making', 'AI & design'] },
+    ];
+    this._feed = [
+      { name: 'Aiman R.', av: 1, time: '2M', text: 'Question for the panel: can we cool a corridor without aircon at all?' },
+      { name: 'Priya N.', av: 2, time: '1M', text: 'The Kampung Vertical model changed how I think about shared balconies.' },
+      { name: 'Wei Lun', av: 3, time: '1M', text: 'Anyone walking the Civic trail at 4pm? Looking for company.' },
+      { name: 'Farah S.', av: 2, time: 'NOW', text: 'Please talk about maintenance. Every good design here dies of upkeep.' },
+      { name: 'Jonas T.', av: 1, time: 'NOW', text: 'Streaming from Jurong — can the speakers repeat the question each time?' },
+      { name: 'Mei Ling', av: 3, time: 'NOW', text: 'Second the maintenance point. Who pays for it after the Biennale ends?' },
+    ];
+    this._teams = [
+      { rank: '1', name: 'STUDIO SEMULA CREW', members: 5, note: 'BRAS BASAH', xp: '18,420' },
+      { rank: '2', name: 'KAMPUNG VERTICAL', members: 5, note: 'QUEENSTOWN', xp: '16,905' },
+      { rank: '3', name: 'TIONG BAHRU WALKERS', members: 4, note: 'TIONG BAHRU', xp: '15,240' },
+      { rank: '18', name: 'SOOT SQUAD', members: 2, note: 'YOUR TEAM', xp: '4,120', you: true },
+    ];
+    this._trailStops = [
+      { x: 672, y: 478, label: 'START' },
+      { x: 634, y: 516, label: 'CIVIC LAWN' },
+      { x: 600, y: 556, label: 'HEAT ISLAND' },
+    ];
+    this._trailUsers = [
+      { x: 660, y: 490, av: 'assets/demo/av-1.png', ring: '#FFD755', name: 'YOU', dur: '2.4s' },
+      { x: 622, y: 528, av: 'assets/demo/av-2.png', ring: '#5BE1FF', name: 'GUIDE', dur: '2.9s' },
+    ];
+    this._drag = null;
+    this._timers = [];
+  }
+  state = {
+    screen: 'home', coins: 2170, xp: 240, joined: false, notified: {},
+    teaserPhase: 'earth', dlgIdx: 0, revealed: 0, dlgAtEnd: false,
+    sheet: null, routeOn: false, trailDemo: false, booth: null, questDoneOnce: false,
+    panX: -560, panY: -230, zoom: 1.1, qIdx: 0, answers: {}, qDone: false,
+    persona: null, tour: null, studioOpen: false, feedOpen: false, lbOpen: false,
+    checkedIn: false, checkedOut: false, feedN: 3, draft: '', userMsgs: [], toast: '',
+  };
+  componentDidMount() {
+    requestAnimationFrame(() => { if (this._vpEl) this._centerMap(); });
+    if (this.props.skipIntro) { this.setState({ screen: 'map' }); this._beginTour(); }
+    else if (this.props.jumpToNarrative) { this.setState({ screen: 'teaser', teaserPhase: 'dialog' }); this._type(this._dialog[0].body.length); }
+  }
+  componentDidUpdate() {
+    const s = this.state;
+    if (s.screen === 'map' && this._lastScreen !== 'map') requestAnimationFrame(this._centerMap);
+    this._lastScreen = s.screen;
+    const n = s.feedN + s.userMsgs.length;
+    if (this._feedEl && n !== this._lastFeedN) this._feedEl.scrollTop = this._feedEl.scrollHeight;
+    this._lastFeedN = n;
+  }
+  componentWillUnmount() { this._timers.forEach(clearTimeout); clearInterval(this._tw); clearInterval(this._feedTimer); }
+  _t(fn, ms) { this._timers.push(setTimeout(fn, ms)); }
+  _type(len) {
+    clearInterval(this._tw);
+    this._typeLen = len;
+    let n = 0;
+    this.setState({ revealed: 0 });
+    this._tw = setInterval(() => {
+      n += 1;
+      if (n >= len) clearInterval(this._tw);
+      this.setState({ revealed: n });
+    }, 16);
+  }
+  _centerMap = () => {
+    const el = this._vpEl;
+    const w = el ? el.clientWidth : 410, h = el ? el.clientHeight : 880;
+    const z = this.state.zoom;
+    const cx = 0.483 * 1350 * z, cy = 0.575 * 900 * z;
+    const bias = this.state.tour != null ? 0.33 : 0.5;
+    const nx = Math.min(0, Math.max(w - 1350 * z, w / 2 - cx));
+    const ny = Math.min(0, Math.max(h - 900 * z, h * bias - cy));
+    this.setState({ panX: nx, panY: ny });
+  };
+  _zoomTo = (mx, my, z, bias) => {
+    const el = this._vpEl;
+    const w = el ? el.clientWidth : 410, h = el ? el.clientHeight : 880;
+    const nx = Math.min(0, Math.max(w - 1350 * z, w / 2 - mx * z));
+    const ny = Math.min(0, Math.max(h - 900 * z, h * (bias || 0.4) - my * z));
+    this.setState({ zoom: z, panX: nx, panY: ny });
+  };
+  _startTeaser = () => {
+    this.setState({ screen: 'teaser', teaserPhase: 'earth', dlgIdx: 0, revealed: 0, dlgAtEnd: false });
+    this._t(() => this.setState({ teaserPhase: 'zoom' }), 4200);
+    this._t(() => { this.setState({ teaserPhase: 'dialog' }); this._type(this._dialog[0].body.length); }, 4700);
+  };
+  _advanceDialog = () => {
+    const { dlgIdx, revealed, dlgAtEnd } = this.state;
+    if (dlgAtEnd) return;
+    const len = this._dialog[dlgIdx].body.length;
+    if (revealed < len) { this.setState({ revealed: len }); return; }
+    if (dlgIdx < this._dialog.length - 1) { this.setState({ dlgIdx: dlgIdx + 1 }); this._type(this._dialog[dlgIdx + 1].body.length); }
+    else { this.setState({ dlgAtEnd: true }); clearInterval(this._tw); }
+  };
+  _beginTour = () => {
+    if (this.props.guidedTour === false) { this.setState({ tour: null }); return; }
+    this._goStep(0);
+  };
+  _goPersona = () => { clearInterval(this._tw); this.setState({ screen: 'persona', sheet: null }); this._type(this._pIntro.length); };
+  _pickPersona = (id) => {
+    const p = this._personas.find(x => x.id === id);
+    const msg = 'Good pick. I have lit up what suits ' + p.name.toLowerCase() + ' and dimmed the rest. In 2027 the whole programme gets curated like this — for every community.';
+    this._pAfter = msg;
+    this.setState({ persona: id });
+    this._type(msg.length);
+  };
+  _openMap = () => { clearInterval(this._tw); this.setState({ screen: 'map', sheet: null }); this._beginTour(); };
+  _step() { return this.state.tour == null ? null : this._tour[this.state.tour]; }
+  _goStep = (i) => {
+    if (i >= this._tour.length) { this.setState({ tour: null }); clearInterval(this._tw); return; }
+    this.setState({ tour: i });
+    this._type(this._tour[i].b.length);
+    const need = this._tour[i].need || '';
+    if (need.indexOf('pin:') === 0) {
+      const e = this._events.find(x => x.id === need.slice(4));
+      if (e) this._t(() => this._zoomTo(e.x / 100 * 1350, e.y / 100 * 900, this.state.zoom, 0.36), 40);
+    }
+  };
+  _advTour = () => {
+    const i = this.state.tour;
+    if (i == null) return;
+    if (this._tour[i].last) { clearInterval(this._tw); this.setState({ tour: null, lbOpen: false }); return; }
+    if (i === 1) this.setState({ studioOpen: false });
+    if (i === 3) { this.setState({ trailDemo: false, routeOn: false, zoom: 1.1 }); this._t(this._centerMap, 40); }
+    if (i === 5) this.setState({ screen: 'map' });
+    if (i === 7) { this.setState({ feedOpen: false }); clearInterval(this._feedTimer); }
+    if (i === 13) this.setState({ lbOpen: false });
+    this._goStep(i + 1);
+  };
+  _sootTap = () => {
+    const st = this._step();
+    if (!st) return;
+    if (this.state.revealed < st.b.length) { clearInterval(this._tw); this.setState({ revealed: st.b.length }); return; }
+    if (!st.need) this._advTour();
+  };
+  _toast = (msg) => {
+    this.setState({ toast: msg });
+    this._t(() => this.setState({ toast: '' }), 1800);
+  };
+  _openFeed = () => {
+    this.setState({ feedOpen: true, feedN: 3 });
+    clearInterval(this._feedTimer);
+    this._feedTimer = setInterval(() => {
+      this.setState(s => (s.feedN >= this._feed.length ? s : { feedN: s.feedN + 1 }));
+    }, 2600);
+  };
+  _pinFeature = (id) => {
+    if (id === 'studio') this.setState({ studioOpen: true });
+    else if (id === 'tour') { this.setState({ trailDemo: true, routeOn: true }); this._zoomTo(640, 518, 1.8, 0.45); }
+    else if (id === 'ndc') this.setState({ screen: 'space', booth: null });
+    else if (id === 'talks') this._openFeed();
+  };
+  _pinTap = (id) => {
+    const st = this._step();
+    if (st) {
+      if (st.need === 'pin:' + id) { this._pinFeature(id); this._advTour(); }
+      return;
+    }
+    this.setState({ sheet: id, routeOn: false, trailDemo: false });
+  };
+  _checkinTap = () => {
+    const st = this._step();
+    if (!this.state.checkedIn) {
+      this.setState(s => ({ checkedIn: true, xp: s.xp + 40 }));
+      this._toast('+40 XP · CHECKED IN');
+      if (st && st.need === 'checkin') this._advTour();
+      return;
+    }
+    if (st && st.need === 'checkout') { this.setState({ checkedOut: true }); this._advTour(); }
+    this._startQuest();
+  };
+  _openLb = () => {
+    const st = this._step();
+    if (st && st.need === 'leaderboard') { this.setState({ lbOpen: true }); this._advTour(); return; }
+    if (st) return;
+    this.setState({ lbOpen: true });
+  };
+  _startQuest = () => this.setState({ screen: 'quest', qIdx: 0, answers: {}, qDone: false, sheet: null, booth: null });
+  _panStart = (e) => {
+    this._vpEl = e.currentTarget;
+    const vp = e.currentTarget.getBoundingClientRect();
+    this._drag = { x: e.clientX, y: e.clientY, px: this.state.panX, py: this.state.panY, w: vp.width, h: vp.height };
+    this._dragging = false;
+  };
+  _panMove = (e) => {
+    if (!this._drag) return;
+    const d = this._drag, z = this.state.zoom;
+    if (!this._dragging) {
+      if (Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) < 8) return;
+      this._dragging = true;
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+    }
+    const nx = Math.min(0, Math.max(d.w - 1350 * z, d.px + e.clientX - d.x));
+    const ny = Math.min(0, Math.max(d.h - 900 * z, d.py + e.clientY - d.y));
+    this.setState({ panX: nx, panY: ny });
+  };
+  _panEnd = () => { this._drag = null; };
+  _setZoom = (dir) => {
+    const steps = [1.1, 1.5, 2];
+    const i = steps.indexOf(this.state.zoom);
+    const z2 = steps[Math.min(steps.length - 1, Math.max(0, i + dir))];
+    const z1 = this.state.zoom;
+    if (z2 === z1) return;
+    const vp = this._vpEl ? { w: this._vpEl.clientWidth, h: this._vpEl.clientHeight } : { w: 400, h: 800 };
+    const cx = vp.w / 2, cy = vp.h / 2;
+    let nx = cx - (cx - this.state.panX) * (z2 / z1);
+    let ny = cy - (cy - this.state.panY) * (z2 / z1);
+    nx = Math.min(0, Math.max(vp.w - 1350 * z2, nx));
+    ny = Math.min(0, Math.max(vp.h - 900 * z2, ny));
+    this.setState({ zoom: z2, panX: nx, panY: ny });
+  };
+  renderVals() {
+    const s = this.state;
+    const live = this.props.liveMode ?? false;
+    const rewardCoins = this.props.questCoins ?? 30;
+    const rewardXp = 120;
+    const dlg = this._dialog[s.dlgIdx];
+    const q = this._questions[s.qIdx];
+    const answered = s.answers[s.qIdx] != null;
+    const ev = this._events.find(e => e.id === s.sheet) || null;
+    const personaObj = this._personas.find(p => p.id === s.persona) || null;
+    const evRec = !!(ev && (!s.persona || (ev.for || []).indexOf(s.persona) >= 0));
+    const st = s.tour == null ? null : this._tour[s.tour];
+    const typing = st ? s.revealed < st.b.length : false;
+    const needPin = st && st.need && st.need.indexOf('pin:') === 0 ? st.need.slice(4) : null;
+    const sootBtn = !!(st && !st.need && !typing);
+    const overlayOpen = s.studioOpen || s.feedOpen || s.lbOpen;
+    const tourBox = !!st && st.need !== 'quest';
+    const feedRows = this._feed.slice(0, s.feedN).concat(s.userMsgs);
+    return {
+      isHome: s.screen === 'home', isTeaser: s.screen === 'teaser', isMap: s.screen === 'map',
+      isSpace: s.screen === 'space', isQuest: s.screen === 'quest',
+      coins: s.coins.toLocaleString('en-SG'), xp: s.xp.toLocaleString('en-SG'), goingCount: '12,835',
+      badgeBg: live ? '#16a34a' : 'rgba(0,0,0,0.55)', badgeLabel: live ? 'Live' : 'Preview',
+      startTeaser: this._startTeaser,
+      startTeaserBtn: (e) => { e.stopPropagation(); this._startTeaser(); },
+      stars: this._stars,
+      teaserEarth: s.teaserPhase === 'earth' || s.teaserPhase === 'zoom',
+      earthAnim: s.teaserPhase === 'zoom' ? 'earthOut 0.6s ease-in both' : 'earthIn 2.6s cubic-bezier(0.22,1,0.36,1) both',
+      teaserDialog: s.teaserPhase === 'dialog',
+      dlgHeader: dlg.header, dlgShown: dlg.body.slice(0, s.revealed),
+      cursorDisplay: (!s.dlgAtEnd && s.revealed < dlg.body.length) ? 'inline' : 'none',
+      dlgAtEnd: s.dlgAtEnd,
+      dlgCta: s.dlgAtEnd ? '' : (s.revealed < dlg.body.length ? '▸▸' : 'TAP ▸'),
+      dlgDots: this._dialog.map((_, i) => ({ bg: i === s.dlgIdx ? '#FFD755' : '#4a4d55' })),
+      advanceDialog: this._advanceDialog, skipTeaser: this._goPersona, openMapBtn: this._goPersona,
+
+      personaImgCss: personaObj ? "url('" + personaObj.img + "')" : 'none',
+      personaChipShow: personaObj ? 'flex' : 'none',
+      personaChipColor: personaObj ? personaObj.color : '#FFD755',
+      personaName: personaObj ? personaObj.name : '',
+      isPersona: s.screen === 'persona',
+      personaHeader: s.persona ? 'YOUR PATH' : 'DESIGN 2035 · THE PEOPLE',
+      personaShown: (s.persona ? (this._pAfter || '') : this._pIntro).slice(0, s.revealed),
+      personaPicked: !!s.persona,
+      personaCards: this._personas.map(p => ({
+        name: p.name, blurb: p.blurb, imgCss: "url('" + p.img + "')",
+        bg: s.persona === p.id ? p.color : '#131e2c',
+        border: s.persona === p.id ? '#FFFFFF' : '#2c3340',
+        shadow: s.persona === p.id ? '#0A1522' : '#0f1722',
+        nameColor: s.persona === p.id ? '#0A1522' : p.color,
+        blurbColor: s.persona === p.id ? 'rgba(10,21,34,0.8)' : '#8a9099',
+        onTap: () => this._pickPersona(p.id),
+      })),
+      enterIsland: this._openMap,
+
+      panTransform: 'translate(' + s.panX + 'px,' + s.panY + 'px) scale(' + s.zoom + ')',
+      panStart: this._panStart, panMove: this._panMove, panEnd: this._panEnd,
+      vpRef: (el) => { if (el && el !== this._vpEl) { this._vpEl = el; requestAnimationFrame(this._centerMap); } },
+      zoomIn: () => this._setZoom(1), zoomOut: () => this._setZoom(-1),
+      backHome: () => this.setState({ screen: 'home', tour: null }),
+      showHint: !st && !overlayOpen && !ev,
+      pins: this._events.map(e => {
+      const rec = !s.persona || (e.for || []).indexOf(s.persona) >= 0;
+      return {
+        left: e.x + '%', top: e.y + '%', iconCss: "url('" + e.icon + "')", label: e.label,
+        opacity: s.trailDemo ? '0.3' : (st && needPin && needPin !== e.id ? '0.42' : (rec ? '1' : '0.34')),
+        labelShow: s.trailDemo ? 'none' : 'block',
+        ringShow: needPin === e.id ? 'block' : 'none',
+        labelBorder: needPin === e.id ? '#FFD755' : (rec ? '#9498a0' : '#3a4250'),
+        labelColor: needPin === e.id ? '#FFD755' : (rec ? '#f3f3ef' : '#6e7783'),
+        onTap: (ev2) => { ev2.stopPropagation(); this._pinTap(e.id); },
+      }; }),
+      routeDisplay: s.routeOn ? 'block' : 'none',
+      trailStops: s.trailDemo ? this._trailStops.map(m => ({ left: m.x + 'px', top: m.y + 'px', label: m.label })) : [],
+      trailUsers: s.trailDemo ? this._trailUsers.map(u => ({ left: u.x + 'px', top: u.y + 'px', avCss: "url('" + u.av + "')", ring: u.ring, name: u.name, dur: u.dur })) : [],
+
+      overlayBottom: tourBox ? (sootBtn ? '332px' : '274px') : '0px',
+      cardRight: tourBox ? '96px' : '0px',
+      studioOpen: s.studioOpen,
+      studioCloseShow: st ? 'none' : 'block',
+      closeStudioModal: () => { if (!st) this.setState({ studioOpen: false }); },
+      feedOpen: s.feedOpen,
+      feedCloseShow: st ? 'none' : 'block',
+      closeFeed: () => { if (!st) { clearInterval(this._feedTimer); this.setState({ feedOpen: false }); } },
+      feedList: feedRows.map((m, i) => ({
+        name: m.name, time: m.time, text: m.text,
+        avCss: "url('assets/demo/av-" + (m.you ? 1 : m.av) + ".png')",
+        ring: m.you ? '#FFD755' : '#5BE1FF',
+        bg: m.you ? '#FFD755' : 'rgba(245,239,228,0.06)',
+        border: m.you ? '#FFFFFF' : '#2c3340',
+        nameColor: m.you ? '#6b5a1e' : '#8a9099',
+        textColor: m.you ? '#191a1d' : '#f3f3ef',
+      })),
+      feedRef: (el) => { this._feedEl = el; },
+      draft: s.draft,
+      onDraft: (e) => this.setState({ draft: e.target.value }),
+      sendMsg: () => {
+        const t = s.draft.trim();
+        if (!t) return;
+        this.setState(x => ({ userMsgs: x.userMsgs.concat([{ name: 'YOU', av: 1, time: 'NOW', text: t, you: true }]), draft: '' }));
+      },
+      lbOpen: s.lbOpen, closeLb: () => this.setState({ lbOpen: false }),
+      trophyRing: st && st.need === 'leaderboard' ? 'block' : 'none',
+      openLeaderboard: this._openLb,
+      teams: this._teams.map(t => {
+        const top = t.rank === '1' || t.rank === '2' || t.rank === '3';
+        return {
+          rank: t.rank, name: t.name, members: t.members, note: t.note, xp: t.xp,
+          bg: t.you ? 'rgba(37,63,246,0.18)' : (top ? 'rgba(255,215,85,0.10)' : 'rgba(245,239,228,0.05)'),
+          border: t.you ? '#3B5BFF' : (top ? '#FFD755' : '#2c3340'),
+          rankColor: t.you ? '#8FA6FF' : (top ? '#FFD755' : '#8a9099'),
+          nameColor: '#f3f3ef',
+          xpColor: t.you ? '#8FA6FF' : (top ? '#FFD755' : '#f3f3ef'),
+        };
+      }),
+
+      checkinCard: !!(st && (st.need === 'checkin' || st.need === 'checkout')) || (!st && s.checkedIn && !s.checkedOut),
+      checkinKicker: s.checkedIn ? 'CHECKED IN 14:22' : 'HAPPENING NOW',
+      checkinLabel: s.checkedIn ? 'CHECK OUT ▸' : 'CHECK IN',
+      checkinBg: s.checkedIn ? '#FFD755' : '#4ADE80',
+      checkinShadow: s.checkedIn ? '#b1932f' : '#2b8f52',
+      checkinColor: '#191a1d',
+      checkinTap: this._checkinTap,
+
+      tourBox, spaceTourBox: !!st && s.screen === 'space',
+      sootHeader: st ? st.h : '', sootShown: st ? st.b.slice(0, s.revealed) : '',
+      sootCursor: typing ? 'inline' : 'none',
+      sootBtn, sootBtnLabel: st && st.btn ? st.btn : 'NEXT ▸',
+      sootBtnBg: st && st.last ? '#4ADE80' : '#FFD755',
+      sootBtnShadow: st && st.last ? '#2b8f52' : '#b1932f',
+      sootBtnColor: '#191a1d',
+      sootHint: st && st.need && !typing ? st.hint : '',
+      sootProgress: st ? (s.tour + 1) + '/' + this._tour.length : '',
+      sootTap: this._sootTap, sootNext: (e) => { e.stopPropagation(); this._advTour(); },
+      toastOn: !!s.toast, toastText: s.toast,
+
+      sheetTagShow: (ev && s.persona) ? 'flex' : 'none',
+      sheetTagLabel: evRec ? 'FOR YOU' : 'OTHER PATH',
+      sheetTagBg: evRec ? (personaObj ? personaObj.color : '#FFD755') : '#FFFFFF',
+      sheetTagColor: evRec ? '#0A1522' : '#8A8078',
+      sheetTagBorder: evRec ? '#191a1d' : '#EDE3D4',
+      sheetOpen: !!ev, closeSheet: () => this.setState({ sheet: null }),
+      sheetType: ev ? ev.type : '', sheetColor: ev ? ev.color : '#FFD755', sheetDates: ev ? ev.dates : '',
+      sheetTitle: ev ? ev.title : '', sheetOrg: ev ? ev.org : '', sheetDistrict: ev ? ev.district : '',
+      sheetDesc: ev ? ev.desc : '',
+      sheetHasSpace: !!(ev && ev.space), sheetHasRoute: !!(ev && ev.route),
+      sheetHasQuest: !!(ev && ev.quest), sheetHasNotify: !!(ev && ev.notify),
+      sheetHasGallery: !!(ev && ev.gallery), sheetHasFeed: !!(ev && ev.feed),
+      openSpace: () => this.setState({ screen: 'space', sheet: null, booth: null }),
+      openStudioModal: () => this.setState({ studioOpen: true, sheet: null }),
+      openFeedBtn: () => { this.setState({ sheet: null }); this._openFeed(); },
+      closeSpace: () => { if (st) { this._advTour(); } else this.setState({ screen: 'map' }); },
+      toggleRoute: () => this.setState(x => ({ routeOn: !x.routeOn, trailDemo: !x.routeOn, sheet: null })),
+      routeBtnLabel: s.routeOn ? 'Hide route' : 'View route on map',
+      routePanel: s.routeOn && !ev && !st,
+      routeStops: [
+        { n: '01', name: 'NATIONAL DESIGN CENTRE', note: 'START' },
+        { n: '02', name: 'CIVIC DISTRICT LAWN', note: '12 MIN' },
+        { n: '03', name: 'MARINA BAY · HEAT ISLAND', note: '18 MIN' },
+      ],
+      questBtnLabel: s.questDoneOnce ? '✓ Quest completed' : 'Start visitor quest · +' + rewardXp + ' XP',
+      questBtnBg: s.questDoneOnce ? '#DCFCE7' : '#FFFFFF', questBtnColor: '#1A1A1A',
+      startQuest: this._startQuest,
+      notifyLabel: ev && s.notified[ev.id] ? '🔔 You’ll be notified' : 'Get notified',
+      notifyBg: ev && s.notified[ev.id] ? '#DCFCE7' : '#FFFFFF',
+      notifyColor: '#1A1A1A',
+      notifyEvent: () => ev && this.setState(x => ({ notified: { ...x.notified, [ev.id]: true } })),
+      booths: this._booths.map((b, i) => ({
+        n: b.n, left: b.x + '%', top: b.y + '%',
+        bg: s.booth === i ? '#FFD755' : '#b4b8bf',
+        onTap: () => this.setState({ booth: i }),
+      })),
+      boothOpen: s.booth != null,
+      boothTitle: s.booth != null ? this._booths[s.booth].n + ' · ' + this._booths[s.booth].title : '',
+      boothStory: s.booth != null ? this._booths[s.booth].story : '',
+      spaceQuestBtn: !st,
+      spaceQuestLabel: s.questDoneOnce ? '✓ QUEST COMPLETED' : 'START VISITOR QUEST · +' + rewardXp + ' XP',
+
+      questActive: !s.qDone, questDone: s.qDone,
+      questStep: (s.qIdx + 1) + ' / ' + this._questions.length,
+      questPct: Math.round(((s.qIdx + (answered ? 1 : 0)) / this._questions.length) * 100) + '%',
+      qKicker: q.kicker, qText: q.text,
+      qIsChoice: q.kind === 'choice', qIsRating: q.kind === 'rating',
+      qOptions: (q.options || []).map((label, i) => ({
+        label,
+        border: s.answers[s.qIdx] === i ? '#253FF6' : '#EDE3D4',
+        bg: s.answers[s.qIdx] === i ? '#EAEEFE' : '#FFFFFF',
+        onTap: () => this.setState(x => ({ answers: { ...x.answers, [x.qIdx]: i } })),
+      })),
+      qRatings: [1, 2, 3, 4, 5].map(n => ({
+        label: String(n),
+        border: s.answers[s.qIdx] === n ? '#253FF6' : '#EDE3D4',
+        bg: s.answers[s.qIdx] === n ? '#EAEEFE' : '#FFFFFF',
+        onTap: () => this.setState(x => ({ answers: { ...x.answers, [x.qIdx]: n } })),
+      })),
+      nextDisabled: !answered,
+      nextBg: answered ? '#253FF6' : '#CFCBC4',
+      nextLabel: s.qIdx < this._questions.length - 1 ? 'Next' : 'Finish quest',
+      questNext: () => {
+        if (!answered) return;
+        if (s.qIdx < this._questions.length - 1) this.setState(x => ({ qIdx: x.qIdx + 1 }));
+        else this.setState(x => ({ qDone: true, coins: x.coins + rewardCoins, xp: x.xp + rewardXp, questDoneOnce: true }));
+      },
+      quitQuest: () => this.setState({ screen: 'map' }),
+      backToMap: () => {
+        this.setState({ screen: 'map' });
+        if (st && st.need === 'quest') this._goStep(s.tour + 1);
+      },
+      rewardCoins, rewardXp,
+    };
+  }
+}
+</script>
+</body>
+</html>
