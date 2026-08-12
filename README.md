@@ -49,24 +49,27 @@ assets/demo/    pixel art, sprites and photography
 file `SDB 135N Demo.dc.html`). The design is the source of truth — regenerate rather than
 hand-edit the template or the app logic.
 
-Exactly four source lines differ from the export, all of them for web publication. Everything
-else — 522 template lines and 487 lines of app logic — is byte-identical:
+Only four lines of the export were touched, all of them for web publication. Everything else —
+522 template lines and 487 lines of app logic — is byte-identical:
 
 | Change | Why |
 | --- | --- |
-| `<head>` metadata | Page title, description, favicon, theme colour, Open Graph tags, `viewport-fit=cover` |
+| `<head>` metadata | Page title, description, favicon, theme colour, Open Graph tags, `viewport-fit=cover`. Open Graph URLs are absolute — relative ones produce an empty share card. |
 | React loaded from `vendor/` | The runtime otherwise pulls React from unpkg at load. A CDN outage would leave a blank page on a submission URL. `loadReactUmd()` short-circuits when `window.React` already exists, so this needed no change to `support.js`. Both files were checked against the SRI hashes pinned in `support.js`. |
 | Removed `position:absolute; left:12px; top:-3px` | Claude Design canvas framing. On a phone it pushed the app 12px off-screen, clipping the right edge (the SKIP button) and forcing a horizontal scrollbar. |
-| Mobile-fit CSS block | Below 440px the phone-frame chrome (rounded corners, drop shadow) is dropped and the app runs edge-to-edge at `100dvh`. Above 440px the framed phone stays centred. |
+| Mobile-fit CSS block | Below 440px the phone-frame chrome (rounded corners, drop shadow) is dropped and the app runs edge-to-edge at `100dvh`. Above 440px the framed phone stays centred. Landscape phones get the full 880px canvas with page scroll instead of clipped CTAs. |
 
-`support.js` and every asset are unmodified copies.
+`support.js` and every asset are unmodified copies. `assets/demo/studio-photo.jpg` is 505KB —
+the largest file here by far — and was deliberately left untouched to keep that provenance claim
+true. Re-encode it in the Claude Design source, not here, or a regenerate will silently revert it.
 
 ## Verified on
 
-Chromium at 360×640, 390×844, 430×932 and 1440×900 — full walkthrough (campaign card → intro →
-character select → island map), zero console errors.
+Chromium at 360×640, 390×844, 430×932, 844×390 (landscape) and 1440×900 — full walkthrough
+(campaign card → intro → character select → island map), zero console errors.
 
-Portrait is the intended orientation; landscape letterboxes the phone frame.
+Portrait is the intended orientation. Landscape phones are shorter than the 880px design canvas,
+so the page scrolls to reach the lower half rather than clipping it.
 
 ## Credits
 

@@ -16,7 +16,11 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="1.35°N — Singapore Design Biennale 2027">
 <meta property="og:description" content="A living map of the Biennale — stories, quests and rewards across every district. Interactive mobile demo by Rally AI.">
-<meta property="og:image" content="./assets/demo/sg-pixel-map.png">
+<!-- Open Graph requires absolute URLs; relative paths yield an empty share card. -->
+<meta property="og:url" content="https://letsrally-ai.github.io/rally-sdb-2027/">
+<meta property="og:image" content="https://letsrally-ai.github.io/rally-sdb-2027/assets/demo/sdb-campaign-banner.png">
+<meta property="og:image:width" content="880">
+<meta property="og:image:height" content="495">
 <meta name="twitter:card" content="summary_large_image">
 <!-- React vendored locally so the demo has no third-party CDN dependency: support.js
      loadReactUmd() short-circuits when window.React / window.ReactDOM already exist.
@@ -42,6 +46,12 @@
     /* Phones: drop the desktop phone-frame chrome and run edge-to-edge */
     @media (max-width:439px){
       .app-shell{width:100vw!important;height:100dvh!important;border-radius:0!important;box-shadow:none!important;}
+    }
+    /* Landscape phones are too short for the 880px canvas: give the shell its full
+       height and let the page scroll, rather than clipping the lower CTAs away. */
+    @media (orientation:landscape) and (max-height:500px){
+      .dc-stage{align-items:flex-start;min-height:auto;}
+      .app-shell{height:880px!important;}
     }
     @keyframes joinPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
     @keyframes ringPulse{0%{transform:translate(-50%,-50%) scale(0.7);opacity:0.9}100%{transform:translate(-50%,-50%) scale(1.9);opacity:0}}
