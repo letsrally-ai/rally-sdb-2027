@@ -59,9 +59,16 @@ Only four lines of the export were touched, all of them for web publication. Eve
 | Removed `position:absolute; left:12px; top:-3px` | Claude Design canvas framing. On a phone it pushed the app 12px off-screen, clipping the right edge (the SKIP button) and forcing a horizontal scrollbar. |
 | Mobile-fit CSS block | Below 440px the phone-frame chrome (rounded corners, drop shadow) is dropped and the app runs edge-to-edge at `100dvh`. Above 440px the framed phone stays centred. Landscape phones get the full 880px canvas with page scroll instead of clipped CTAs. |
 
-`support.js` and every asset are unmodified copies. `assets/demo/studio-photo.jpg` is 505KB —
-the largest file here by far — and was deliberately left untouched to keep that provenance claim
-true. Re-encode it in the Claude Design source, not here, or a regenerate will silently revert it.
+`support.js` and 45 of the 46 assets are unmodified copies.
+
+The one exception is `assets/demo/studio-photo.jpg`, the only photograph here and by far the
+largest file. It shipped at 1600×1068 / 505KB but is displayed in a modal capped at 330px wide,
+so it was ~5× oversized even for a 3× screen. Re-encoded to 800×534 at q85 — **142KB, 72%
+smaller** — which is still 2.4× the display width. The same file was written back to the Claude
+Design source, so a re-export keeps it rather than reverting to the 505KB original.
+
+This is safe here only because it is a photograph. The rest of `assets/demo/` is pixel art and
+must never be resampled — rescaling it would destroy the hard pixel edges the whole look depends on.
 
 ## Verified on
 

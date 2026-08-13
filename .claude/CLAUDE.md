@@ -18,7 +18,9 @@ submission to the Singapore Design Biennale 2027 International Open Call.
   the template or app logic here.
 - Only 4 export lines are modified: head meta, vendored React, canvas-offset removal,
   mobile-fit CSS. Everything below the `.app-shell` div must stay byte-identical.
-- `support.js` and `assets/demo/` are unmodified copies. Re-copy, never edit.
+- `support.js` and `assets/demo/` are unmodified copies. Re-copy, never edit. Sole exception:
+  `studio-photo.jpg`, re-encoded 1600px→800px (505KB→142KB) in BOTH this repo and the design
+  source. It is the only photo; everything else is pixel art and must NEVER be resampled.
 
 ## Gotchas
 - Open Graph URLs must be ABSOLUTE — relative ones silently give an empty share card
