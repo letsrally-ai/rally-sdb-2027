@@ -46,8 +46,9 @@ assets/demo/    pixel art, sprites and photography
 ## Provenance
 
 `index.html` is generated from **Claude Design** (source project: `rally-sdb-2027`,
-file `SDB 135N Demo.dc.html`). The design is the source of truth — regenerate rather than
-hand-edit the template or the app logic.
+file `SDB 135N Demo.dc.html`). That project lives in Claude Design; this repo holds only the
+published output. The design is the source of truth — regenerate rather than hand-edit the
+template or the app logic.
 
 Only four lines of the export were touched, all of them for web publication. Everything else —
 522 template lines and 487 lines of app logic — is byte-identical:
@@ -64,8 +65,14 @@ Only four lines of the export were touched, all of them for web publication. Eve
 The one exception is `assets/demo/studio-photo.jpg`, the only photograph here and by far the
 largest file. It shipped at 1600×1068 / 505KB but is displayed in a modal capped at 330px wide,
 so it was ~5× oversized even for a 3× screen. Re-encoded to 800×534 at q85 — **142KB, 72%
-smaller** — which is still 2.4× the display width. The same file was written back to the Claude
-Design source, so a re-export keeps it rather than reverting to the 505KB original.
+smaller** — which is still 2.4× the display width.
+
+⚠️ A re-export from Claude Design ships the 505KB original and will silently undo this. Re-apply
+after any re-export:
+
+```bash
+magick studio-photo.jpg -resize 800x -strip -interlace Plane -quality 85 studio-photo.jpg
+```
 
 This is safe here only because it is a photograph. The rest of `assets/demo/` is pixel art and
 must never be resampled — rescaling it would destroy the hard pixel edges the whole look depends on.
